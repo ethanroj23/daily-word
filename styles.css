@@ -1,8 +1,10 @@
 
 :root {
-    --color1: #FA9F42;
+    /* --color1: #FA9F42; */
+    --color1: black;
     --color2: #721817;
-    --color3: #2B4162;
+    /* --color3: #2B4162; */
+    --color3: white;
   }
 
 @font-face {
@@ -37,7 +39,7 @@ body{
 
 .inner-body {
     margin: auto;
-    width: 50%;
+    width: 95%;
     padding-top:10px;
   }
 

@@ -26,4 +26,6 @@ function pageLoaded(){
     document.getElementById("verse_title").textContent = verses[idx][0];
     document.getElementById("verse").textContent = verses[idx][1];
     console.log(idx);
+
+    
 }
