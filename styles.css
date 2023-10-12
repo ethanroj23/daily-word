@@ -1,0 +1,48 @@
+
+:root {
+    --color1: #FA9F42;
+    --color2: #721817;
+    --color3: #2B4162;
+  }
+
+@font-face {
+font-family: 'Inter';
+src:  url('font/Inter/Inter-Black.woff') format('woff'),
+url('font/Inter/Inter-ExtraLight.woff') format('woff'),
+url('font/Inter/Inter-Regular.woff') format('woff'),
+url('font/Inter/Inter-Bold.woff') format('woff'),
+url('font/Inter/Inter-Light.woff') format('woff'),
+url('font/Inter/Inter-SemiBold.woff') format('woff'),
+url('font/Inter/Inter-ExtraBold.woff') format('woff'),
+url('font/Inter/Inter-Medium.woff') format('woff'),
+url('font/Inter/Inter-Thin.woff') format('woff');
+  }
+
+@font-face {
+font-family: 'InterMedium';
+src: url('font/Inter/Inter-SemiBold.woff') format('woff');
+}
+
+
+
+body{
+    font-family: 'Inter';
+    color:var(--color1);
+    background-color: var(--color3);
+}
+
+#verse{
+    font-family: 'InterMedium';
+}
+
+.inner-body {
+    margin: auto;
+    width: 50%;
+    padding-top:10px;
+  }
+
+.date{
+    font-weight:900;
+    font-size:20px;
+    color:var(--color1)
+}
