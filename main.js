@@ -1,6 +1,12 @@
 
 const verses = [
     ['Mosiah 3:9', 'And lo, he cometh unto his own, that salvation might come unto the children of men even through faith on his name; and even after all this they shall consider him a man, and say that he hath a devil, and shall scourge him, and shall crucify him.'],
+    ['Mosiah 3:9', 'And lo, he cometh unto his own, that salvation might come unto the children of men even through faith on his name; and even after all this they shall consider him a man, and say that he hath a devil, and shall scourge him, and shall crucify him.'],
+    ['Mosiah 3:9', 'And lo, he cometh unto his own, that salvation might come unto the children of men even through faith on his name; and even after all this they shall consider him a man, and say that he hath a devil, and shall scourge him, and shall crucify him.'],
+    ['Mosiah 3:9', 'And lo, he cometh unto his own, that salvation might come unto the children of men even through faith on his name; and even after all this they shall consider him a man, and say that he hath a devil, and shall scourge him, and shall crucify him.'],
+    ['Mosiah 3:9', 'And lo, he cometh unto his own, that salvation might come unto the children of men even through faith on his name; and even after all this they shall consider him a man, and say that he hath a devil, and shall scourge him, and shall crucify him.'],
+    ['Mosiah 3:9', 'And lo, he cometh unto his own, that salvation might come unto the children of men even through faith on his name; and even after all this they shall consider him a man, and say that he hath a devil, and shall scourge him, and shall crucify him.'],
+    ['Mosiah 3:9', 'And lo, he cometh unto his own, that salvation might come unto the children of men even through faith on his name; and even after all this they shall consider him a man, and say that he hath a devil, and shall scourge him, and shall crucify him.'],
     ['verse title2', 'verse content'],
     ['verse title3', 'verse content'],
     ['verse title4', 'verse content'],
@@ -19,13 +25,20 @@ function getDaysSince(){
     return diffDays
 }
 
-
+function getFormattedDate(){
+    const d = new Date();
+    const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()];
+    const year = d.getFullYear();
+    return month + ' ' + d.getDate() + ', ' + year;
+}
 
 function pageLoaded(){
     const idx = getDaysSince();
+    const curDate = getFormattedDate();
     document.getElementById("verse_title").textContent = verses[idx][0];
     document.getElementById("verse").textContent = verses[idx][1];
+    document.getElementById("date").textContent = curDate;
     console.log(idx);
 
-    
+
 }
