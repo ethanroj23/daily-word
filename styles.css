@@ -25,7 +25,10 @@ font-family: 'InterMedium';
 src: url('font/Inter/Inter-SemiBold.woff') format('woff');
 }
 
-
+a {
+    text-decoration: unset;
+    color: unset;
+}
 
 body{
     font-family: 'Inter';
