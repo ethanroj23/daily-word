@@ -16,30 +16,34 @@ function getFormattedDate(){
     return month + ' ' + d.getDate() + ', ' + year;
 }
 
+const colorOfDay = [
+    '#ACF39D',
+    '#E85F5C',
+    '#AED1FE',
+    '#BEB7DF',
+    '#FDC05D',
+    '#FFC4D1',
+    'white',
+]
+
 function pageLoaded(){
     const idx = getDaysSince();
     const curDate = getFormattedDate();
     const verseToGet = verses[idx];
+    const dayOfWeek = idx % 7;
 
     const bookUnderscore = verseToGet.split(' ')[0];
     const chapter_verse = verseToGet.split(' ')[1].split(':');
     const chapter = chapter_verse[0];
     const verse = chapter_verse[1];
 
-    console.log('verseToGet', verseToGet);
-    console.log('split', verseToGet.split(' '));
-    console.log('bookUnderscore', bookUnderscore);
-    console.log('chapter_verse', chapter_verse);
-    console.log('chapter', chapter);
-    console.log('verse', verse);
-
     document.getElementById("verse_title").textContent = verseToGet.replace('_', ' ');
     document.getElementById("verse_link").href = `https://www.churchofjesuschrist.org/study/scriptures/bofm/${abbrevs[bookUnderscore]}/${chapter}?lang=eng&id=p${verse}#p${verse}`
 
-
     updateText(`/verses/Book of Mormon/${bookUnderscore}/${chapter}/${verse}.txt`)
     document.getElementById("date").textContent = curDate;
-    console.log(idx);
+
+    document.body.style.backgroundColor = colorOfDay[dayOfWeek];
 }
 
 
