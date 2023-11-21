@@ -5,7 +5,7 @@ const firstDate = new Date(2023, 9, 12);
 
 function getDaysSince(){
     const secondDate = new Date();
-    const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+    const diffDays = Math.floor(Math.abs((firstDate - secondDate) / oneDay));
     return diffDays
 }
 
