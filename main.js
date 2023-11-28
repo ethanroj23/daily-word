@@ -29,8 +29,17 @@ const colorOfDay = [
 function pageLoaded(){
     const idx = getDaysSince();
     const curDate = getFormattedDate();
-    const verseToGet = verses[idx];
+    let verseToGet = verses[idx];
+    let customVerse = false;
     const dayOfWeek = idx % 7;
+
+    // If the user defined query params, use those instead to determine verse
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('book') && urlParams.has('chapter') && urlParams.has('verse')){
+        customVerse = true;
+        verseToGet = urlParams.get('book').replace(' ', '_')+' '+urlParams.get('chapter')+':'+urlParams.get('verse')
+    }
+
 
     const bookUnderscore = verseToGet.split(' ')[0];
     const chapter_verse = verseToGet.split(' ')[1].split(':');
@@ -43,7 +52,15 @@ function pageLoaded(){
     updateText(`/verses/Book of Mormon/${bookUnderscore}/${chapter}/${verse}.txt`)
     document.getElementById("date").textContent = curDate;
 
-    document.body.style.backgroundColor = colorOfDay[dayOfWeek];
+    // set background color
+    if (customVerse){
+        if (urlParams.has('color')){
+            document.body.style.backgroundColor = urlParams.get('color');
+        }
+    }
+    else {
+        document.body.style.backgroundColor = colorOfDay[dayOfWeek];
+    }
 }
 
 
