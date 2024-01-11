@@ -66,17 +66,18 @@ function pageLoaded(){
 }
 
 var globalSelection = null;
-var prevSelection = null;
 var getGlobalSelection = function() {
-  if (globalSelection !== null && globalSelection.toString().trim() !== '') {
-    prevSelection = globalSelection;
-  }
-
   try {
     if (window.getSelection) {
-      globalSelection = window.getSelection();
+      let tempSelection = window.getSelection();
+      if (tempSelection.toString().trim() !== ''){
+        globalSelection = window.getSelection();
+      }
     } else {
-      globalSelection = document.getSelection();
+      let tempSelection = document.getSelection();
+      if (tempSelection.toString().trim() !== ''){
+        globalSelection = document.getSelection();
+      }
     }
   } catch (err) {
     
@@ -85,12 +86,12 @@ var getGlobalSelection = function() {
 
 
 function highlightSelectedText(colorClass) {
-  if (prevSelection.rangeCount > 0) {
-    var range = prevSelection.getRangeAt(0);
+  if (globalSelection.rangeCount > 0) {
+    var range = globalSelection.getRangeAt(0);
     var span = document.createElement('span');
     span.className = 'highlight-' + colorClass + " highlight";
     range.surroundContents(span);
-    prevSelection.removeAllRanges();
+    globalSelection.removeAllRanges();
   }
 }
 
