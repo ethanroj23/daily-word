@@ -27,6 +27,7 @@ const colorOfDay = [
 ]
 
 function pageLoaded(){
+    setInterval(getGlobalSelection, 150);
     addHighlightEventListeners();
     const idx = getDaysSince();
     const curDate = getFormattedDate();
@@ -64,33 +65,27 @@ function pageLoaded(){
     }
 }
 
-var testColor = "#ff000088";
-var selectedRange = null;
-var getSelectedRange = function() {
-  document.body.style.background = testColor;
-  if (testColor == "#ff000088") testColor = "#ff000099";
-  else testColor = "#ff000088";
+var globalSelection = null;
+var getGlobalSelection = function() {
   try {
     if (window.getSelection) {
-      selectedRange = window.getSelection().getRangeAt(0);
+      globalSelection = window.getSelection();
     } else {
-      selectedRange = document.getSelection().getRangeAt(0);
+      globalSelection = document.getSelection();
     }
   } catch (err) {
     
   }
 };
-timer = setInterval(getSelectedRange, 150);
+
 
 function highlightSelectedText(colorClass) {
-  var selection = window.getSelection();
-  if (selection.rangeCount > 0) {
-    // var range = selection.getRangeAt(0);
-    var range = selectedRange;
+  if (globalSelection.rangeCount > 0) {
+    var range = globalSelection.getRangeAt(0);
     var span = document.createElement('span');
     span.className = 'highlight-' + colorClass + " highlight";
     range.surroundContents(span);
-    selection.removeAllRanges();
+    globalSelection.removeAllRanges();
   }
 }
 
