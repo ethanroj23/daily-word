@@ -83,40 +83,13 @@ var getSelectedRange = function() {
 
 };
 
-// var globalSelection = null;
-// var getGlobalSelection = function() {
-//   try {
-//     if (window.getSelection) {
-//       let tempSelection = window.getSelection();
-//       if (tempSelection.toString().trim() !== ''){
-//         globalSelection = window.getSelection();
-//       }
-//     } else {
-//       let tempSelection = document.getSelection();
-//       if (tempSelection.toString().trim() !== ''){
-//         globalSelection = document.getSelection();
-//       }
-//     }
-//   } catch (err) {
-    
-//   }
-// };
 
 
 function highlightSelectedText(colorClass) {
   if (selectedRange) {
-      alert(selectedRange.toString());
-      // clearInterval(timer);
-  }
-
-
-  // if (globalSelection.rangeCount > 0) {
-  if (selectedRange) {
-    // var range = globalSelection.getRangeAt(0);
     var span = document.createElement('span');
     span.className = 'highlight-' + colorClass + " highlight";
     selectedRange.surroundContents(span);
-    // globalSelection.removeAllRanges();
   }
 }
 
@@ -134,7 +107,7 @@ function bodyClicked(){
   var ui = document.querySelector('.highlight-ui');
   ui.style.opacity = 1;
   clearTimeout(uiTimeout);
-  uiTimeout = setTimeout(hideUI, 10000);
+  uiTimeout = setTimeout(hideUI, 5000);
 }
 
 function hideUI(){
