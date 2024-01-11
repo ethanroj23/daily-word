@@ -64,10 +64,29 @@ function pageLoaded(){
     }
 }
 
+var testColor = "#ff000088";
+var selectedRange = null;
+var getSelectedRange = function() {
+  document.body.style.background = testColor;
+  if (testColor == "#ff000088") testColor = "#ff000099";
+  else testColor = "#ff000088";
+  try {
+    if (window.getSelection) {
+      selectedRange = window.getSelection().getRangeAt(0);
+    } else {
+      selectedRange = document.getSelection().getRangeAt(0);
+    }
+  } catch (err) {
+    
+  }
+};
+timer = setInterval(getSelectedRange, 150);
+
 function highlightSelectedText(colorClass) {
   var selection = window.getSelection();
   if (selection.rangeCount > 0) {
-    var range = selection.getRangeAt(0);
+    // var range = selection.getRangeAt(0);
+    var range = selectedRange;
     var span = document.createElement('span');
     span.className = 'highlight-' + colorClass + " highlight";
     range.surroundContents(span);
