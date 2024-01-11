@@ -27,7 +27,8 @@ const colorOfDay = [
 ]
 
 function pageLoaded(){
-    setInterval(getGlobalSelection, 150);
+    timer = setInterval(getSelectedRange, 150);
+
     addHighlightEventListeners();
     const idx = getDaysSince();
     const curDate = getFormattedDate();
@@ -65,33 +66,57 @@ function pageLoaded(){
     }
 }
 
-var globalSelection = null;
-var getGlobalSelection = function() {
+
+
+var timer = null;
+var selectedRange = null;
+var getSelectedRange = function() {
   try {
-    if (window.getSelection) {
-      let tempSelection = window.getSelection();
-      if (tempSelection.toString().trim() !== ''){
-        globalSelection = window.getSelection();
+      if (window.getSelection) {
+          selectedRange = window.getSelection().getRangeAt(0);
+      } else {
+          selectedRange = document.getSelection().getRangeAt(0);
       }
-    } else {
-      let tempSelection = document.getSelection();
-      if (tempSelection.toString().trim() !== ''){
-        globalSelection = document.getSelection();
-      }
-    }
   } catch (err) {
-    
+
   }
+
 };
+
+// var globalSelection = null;
+// var getGlobalSelection = function() {
+//   try {
+//     if (window.getSelection) {
+//       let tempSelection = window.getSelection();
+//       if (tempSelection.toString().trim() !== ''){
+//         globalSelection = window.getSelection();
+//       }
+//     } else {
+//       let tempSelection = document.getSelection();
+//       if (tempSelection.toString().trim() !== ''){
+//         globalSelection = document.getSelection();
+//       }
+//     }
+//   } catch (err) {
+    
+//   }
+// };
 
 
 function highlightSelectedText(colorClass) {
-  if (globalSelection.rangeCount > 0) {
-    var range = globalSelection.getRangeAt(0);
+  if (selectedRange) {
+      alert(selectedRange.toString());
+      // clearInterval(timer);
+  }
+
+
+  // if (globalSelection.rangeCount > 0) {
+  if (selectedRange) {
+    // var range = globalSelection.getRangeAt(0);
     var span = document.createElement('span');
     span.className = 'highlight-' + colorClass + " highlight";
-    range.surroundContents(span);
-    globalSelection.removeAllRanges();
+    selectedRange.surroundContents(span);
+    // globalSelection.removeAllRanges();
   }
 }
 
