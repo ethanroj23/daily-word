@@ -27,6 +27,7 @@ const colorOfDay = [
 ]
 
 function pageLoaded(){
+    addHighlightEventListeners();
     const idx = getDaysSince();
     const curDate = getFormattedDate();
     let verseToGet = verses[idx];
@@ -63,6 +64,54 @@ function pageLoaded(){
     }
 }
 
+function highlightSelectedText(colorClass) {
+  var selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    var range = selection.getRangeAt(0);
+    var span = document.createElement('span');
+    span.className = 'highlight-' + colorClass + " highlight";
+    range.surroundContents(span);
+    selection.removeAllRanges();
+  }
+}
+
+/* Highlighter code */
+function removeHighlight() {
+  var highlightedElements = document.querySelectorAll('.highlight');
+  highlightedElements.forEach(function(element) {
+    var parent = element.parentNode;
+    parent.replaceChild(document.createTextNode(element.textContent), element);
+  });
+}
+
+let uiTimeout;
+function bodyClicked(){
+  var ui = document.querySelector('.highlight-ui');
+  ui.style.opacity = 1;
+  clearTimeout(uiTimeout);
+  uiTimeout = setTimeout(hideUI, 10000);
+}
+
+function hideUI(){
+  var ui = document.querySelector('.highlight-ui');
+  ui.style.opacity = 0;
+}
+
+const COLOR_COUNT = 6;
+function addHighlightEventListeners(){
+
+  document.body.addEventListener('click', function() {
+    bodyClicked();
+  });
+
+  for (let x=0; x<COLOR_COUNT; x++){
+    document.getElementById('highlight'+x).addEventListener('click', function() {
+      highlightSelectedText(x);
+    });
+  }
+  
+  document.getElementById('removeHighlight').addEventListener('click', removeHighlight);
+}
 
 
 const abbrevs = {
@@ -86,13 +135,19 @@ const abbrevs = {
 
 async function updateText(fileToGet) {
     console.log('getting: ', fileToGet)
-	let response = await fetch(fileToGet);
+  let text_data = "";
+  try {
+	  response = await fetch(fileToGet);
+    if(response.status != 200) {
+      throw new Error("Server Error");
+    }
+    text_data = await response.text();
+  }
+  catch {
+    text_data = "Ye cannot say, when ye are brought to that awful crisis, that I will repent, that I will return to my God. Nay, ye cannot say this; for that same spirit which doth possess your bodies at the time that ye go out of this life, that same spirit will have power to possess your body in that eternal world. (local)";
+  }
 		
-	if(response.status != 200) {
-		throw new Error("Server Error");
-	}
-	let text_data = await response.text();
-    document.getElementById("verse").textContent = text_data;
+  document.getElementById("verse").textContent = text_data;
 }
 
 const verses = ['Alma 31:15',

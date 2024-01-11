@@ -5,7 +5,14 @@
     --color2: #721817;
     /* --color3: #2B4162; */
     --color3: white;
+    --highlight0: #FF000088;
+    --highlight1: #FFA50088;
+    --highlight2: #FFFF0088;
+    --highlight3: #00800088;
+    --highlight4: #0000FF88;
+    --highlight5: #4B008288;
   }
+
 
 @font-face {
 font-family: 'Inter';
@@ -51,3 +58,38 @@ body{
     font-size:20px;
     color:var(--color1)
 }
+
+
+
+
+
+
+
+.highlight-button{
+  width: 25px;
+  aspect-ratio: 1;
+  border-radius: 100px;
+}
+
+.highlight-ui{
+  transition: opacity 0.5s ease-in-out;
+}
+
+
+.highlight-0 {background-color: var(--highlight0);}
+.highlight-1 {background-color: var(--highlight1);}
+.highlight-2 {background-color: var(--highlight2);}
+.highlight-3 {background-color: var(--highlight3);}
+.highlight-4 {background-color: var(--highlight4);}
+.highlight-5 {background-color: var(--highlight5);}
+
+#highlight0{background-color: var(--highlight0);}
+#highlight1{background-color: var(--highlight1);}
+#highlight2{background-color: var(--highlight2);}
+#highlight3{background-color: var(--highlight3);}
+#highlight4{background-color: var(--highlight4);}
+#highlight5{background-color: var(--highlight5);}
+
+/* .highlight-container{
+
+} */
