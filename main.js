@@ -66,7 +66,12 @@ function pageLoaded(){
 }
 
 var globalSelection = null;
+var prevSelection = null;
 var getGlobalSelection = function() {
+  if (globalSelection !== null && globalSelection.toString().trim() !== '') {
+    prevSelection = globalSelection;
+  }
+
   try {
     if (window.getSelection) {
       globalSelection = window.getSelection();
@@ -80,12 +85,12 @@ var getGlobalSelection = function() {
 
 
 function highlightSelectedText(colorClass) {
-  if (globalSelection.rangeCount > 0) {
-    var range = globalSelection.getRangeAt(0);
+  if (prevSelection.rangeCount > 0) {
+    var range = prevSelection.getRangeAt(0);
     var span = document.createElement('span');
     span.className = 'highlight-' + colorClass + " highlight";
     range.surroundContents(span);
-    globalSelection.removeAllRanges();
+    prevSelection.removeAllRanges();
   }
 }
 
