@@ -73,6 +73,7 @@ body{
   border-radius: 100px;
 }
 
+
 .highlight-ui{
   transition: opacity 0.5s ease-in-out;
 }
@@ -91,6 +92,21 @@ body{
 #highlight3{background-color: var(--highlight3);}
 #highlight4{background-color: var(--highlight4);}
 #highlight5{background-color: var(--highlight5);}
+
+
+.top-container{
+  display:grid;
+  grid-template-columns: 30% auto;
+}
+
+.speaker{
+  width: 80%;
+  margin:auto;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 100px;
+  aspect-ratio: 1;
+}
 
 /* .highlight-container{
 

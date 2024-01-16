@@ -36,6 +36,12 @@ function pageLoaded(){
     let customVerse = false;
     const dayOfWeek = idx % 7;
 
+    if (idx.toString() != localStorage.getItem('day_idx')){
+      localStorage.setItem('day_idx', idx.toString());
+      localStorage.setItem('verse', '');
+    }
+
+
     // If the user defined query params, use those instead to determine verse
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('book') && urlParams.has('chapter') && urlParams.has('verse')){
@@ -84,17 +90,37 @@ var getSelectedRange = function() {
 };
 
 
+function highlightFromLS(start, end, color, wait) {
+  
+}
 
-function highlightSelectedText(colorClass) {
+
+function highlightSelectedText(color, add=true) {
   if (selectedRange) {
     var span = document.createElement('span');
-    span.className = 'highlight-' + colorClass + " highlight";
+    span.className = 'highlight-' + color + " highlight";
     selectedRange.surroundContents(span);
+    if (add) addHighlightToLS();
   }
+}
+
+
+function renderHighlights(){
+  var originalElement = document.getElementById('verse');
+  var newHTMLContent = localStorage.getItem('verse');
+  var newElement = document.createElement('div');
+  newElement.innerHTML = newHTMLContent;
+  originalElement.replaceWith(newElement);
+}
+
+
+function addHighlightToLS(){
+  localStorage.setItem('verse', document.getElementById('verse').outerHTML);
 }
 
 /* Highlighter code */
 function removeHighlight() {
+  localStorage.setItem('verse', '');
   var highlightedElements = document.querySelectorAll('.highlight');
   highlightedElements.forEach(function(element) {
     var parent = element.parentNode;
@@ -102,15 +128,14 @@ function removeHighlight() {
   });
 }
 
-let uiTimeout;
 function bodyClicked(){
   var ui = document.querySelector('.highlight-ui');
   ui.style.opacity = 1;
-  clearTimeout(uiTimeout);
-  uiTimeout = setTimeout(hideUI, 5000);
 }
 
-function hideUI(){
+function hideUI(e){
+  e.stopPropagation();
+  console.log('hide UI');
   var ui = document.querySelector('.highlight-ui');
   ui.style.opacity = 0;
 }
@@ -131,6 +156,23 @@ function addHighlightEventListeners(){
   document.getElementById('removeHighlight').addEventListener('click', removeHighlight);
 }
 
+const scripture_citation_index = {
+  "1 Nephi": "https://scriptures.byu.edu/#::c0cd",
+  "2 Nephi": "https://scriptures.byu.edu/#::c0ce",
+  "Jacob": "https://scriptures.byu.edu/#::c0cf",
+  "Enos": "https://scriptures.byu.edu/#::c0d0",
+  "Jarom": "https://scriptures.byu.edu/#::c0d1",
+  "Omni": "https://scriptures.byu.edu/#::c0d2",
+  "Words of Mormon": "https://scriptures.byu.edu/#::c0d3",
+  "Mosiah": "https://scriptures.byu.edu/#::c0d4",
+  "Alma": "https://scriptures.byu.edu/#::c0d5",
+  "Helaman": "https://scriptures.byu.edu/#::c0d6",
+  "3 Nephi": "https://scriptures.byu.edu/#::c0d7",
+  "4 Nephi": "https://scriptures.byu.edu/#::c0d8",
+  "Mormon": "https://scriptures.byu.edu/#::c0d9",
+  "Ether": "https://scriptures.byu.edu/#::c0da",
+  "Moroni": "https://scriptures.byu.edu/#::c0db",
+}
 
 const abbrevs = {
 '1_Nephi': '1-ne',
@@ -166,6 +208,9 @@ async function updateText(fileToGet) {
   }
 		
   document.getElementById("verse").textContent = text_data;
+  if (localStorage.getItem('verse') != ''){
+    renderHighlights();
+  }
 }
 
 const verses = ['Alma 31:15',

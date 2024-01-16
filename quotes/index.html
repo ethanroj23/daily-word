@@ -1,14 +1,20 @@
 <html>
  <head>
-  <link rel="stylesheet" href="styles.css">
-  <script src="main.js"></script>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../main.js"></script>
+  <script src="quotes.js"></script>
  </head>
- <body onload="pageLoaded()">
+ <body onload="quotesOnload()">
   <div class="inner-body">
   <div id="date">October 11, 2023</div>
+
+  <div class="top-container">
+    <img class="speaker" src="https://www.churchofjesuschrist.org/imgs/57efa9db7ae0bb889d74594f5a694c413b4483de/full/1920%2C/0/default" alt="President Nelson">
   <a id="verse_link">
+
    <h1 id="verse_title"></h1>
   </a>
+  </div>
    <p id="verse"></p>
    <div class="highlight-ui">
    <div class="highlightContainer">
@@ -19,8 +25,7 @@
     <button class="highlight-button" id="highlight4"></button>
     <button class="highlight-button" id="highlight5"></button>
   </div>
-  <button id="removeHighlight">Remove All</button>
-  <button id="hideHighlightUi" onclick="hideUI(event)">Hide UI</button>
+  <button id="removeHighlight">Remove Highlights</button>
   </div>
   </div>
  </body>
