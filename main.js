@@ -26,6 +26,10 @@ const colorOfDay = [
     'white',
 ]
 
+function apiUrlDailyOnload(){
+  document.getElementsByClassName("inner-body")[0].textContent = "Testing This";
+}
+
 function pageLoaded(){
     timer = setInterval(getSelectedRange, 150);
 
