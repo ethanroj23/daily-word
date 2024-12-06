@@ -27,7 +27,7 @@ const colorOfDay = [
 ]
 
 function apiUrlDailyOnload(){
-  document.getElementsByClassName("inner-body")[0].textContent = "Testing This";
+  document.getElementsByClassName("inner-body")[0].textContent = "https://www.churchofjesuschrist.org/study/scriptures/bofm/1-ne/13?lang=eng&id=p12#p12";
 }
 
 function pageLoaded(){
