@@ -27,7 +27,24 @@ const colorOfDay = [
 ]
 
 function apiUrlDailyOnload(){
-  document.getElementsByClassName("inner-body")[0].textContent = "https://www.churchofjesuschrist.org/study/scriptures/bofm/1-ne/13?lang=eng&id=p12#p12";
+  const idx = getDaysSince();
+  let verseToGet = verses[idx];
+  let customVerse = false;
+
+  // If the user defined query params, use those instead to determine verse
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('book') && urlParams.has('chapter') && urlParams.has('verse')){
+      customVerse = true;
+      verseToGet = urlParams.get('book').replace(' ', '_')+' '+urlParams.get('chapter')+':'+urlParams.get('verse')
+  }
+
+  const bookUnderscore = verseToGet.split(' ')[0];
+  const chapter_verse = verseToGet.split(' ')[1].split(':');
+  const chapter = chapter_verse[0];
+  const verse = chapter_verse[1];
+
+  const daily_url = `https://www.churchofjesuschrist.org/study/scriptures/bofm/${abbrevs[bookUnderscore]}/${chapter}?lang=eng&id=p${verse}#p${verse}`
+  document.getElementsByClassName("inner-body")[0].textContent = daily_url;
 }
 
 function pageLoaded(){
