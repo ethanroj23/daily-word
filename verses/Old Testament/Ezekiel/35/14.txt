@@ -1,0 +1,1 @@
+Thus saith the Lord God; When the whole earth rejoiceth, I will make thee desolate.

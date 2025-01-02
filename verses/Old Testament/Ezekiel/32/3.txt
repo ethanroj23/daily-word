@@ -1,0 +1,1 @@
+Thus saith the Lord God; I will therefore spread out my net over thee with a company of many people; and they shall bring thee up in my net.

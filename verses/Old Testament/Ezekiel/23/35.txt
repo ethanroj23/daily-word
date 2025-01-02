@@ -1,0 +1,1 @@
+Therefore thus saith the Lord God; Because thou hast forgotten me, and cast me behind thy back, therefore bear thou also thy lewdness and thy whoredoms.

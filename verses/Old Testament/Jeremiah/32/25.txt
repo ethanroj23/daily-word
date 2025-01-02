@@ -1,0 +1,1 @@
+And thou hast said unto me, O Lord God, Buy thee the field for money, and take witnesses; for the city is given into the hand of the Chaldeans.

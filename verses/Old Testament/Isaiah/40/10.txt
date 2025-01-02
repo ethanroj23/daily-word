@@ -1,0 +1,1 @@
+Behold, the Lord God will come with strong hand, and his arm shall rule for him: behold, his reward is with him, and his work before him.

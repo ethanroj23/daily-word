@@ -1,0 +1,1 @@
+Wherefore say unto them, Thus saith the Lord God; Ye eat with the blood, and lift up your eyes toward your idols, and shed blood: and shall ye possess the land?

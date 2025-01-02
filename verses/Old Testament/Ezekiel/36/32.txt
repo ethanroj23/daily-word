@@ -1,0 +1,1 @@
+Not for your sakes do I this, saith the Lord God, be it known unto you: be ashamed and confounded for your own ways, O house of Israel.

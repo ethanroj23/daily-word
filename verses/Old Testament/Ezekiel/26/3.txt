@@ -1,0 +1,1 @@
+Therefore thus saith the Lord God; Behold, I am against thee, O Tyrus, and will cause many nations to come up against thee, as the sea causeth his waves to come up.

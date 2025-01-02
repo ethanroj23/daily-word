@@ -1,0 +1,1 @@
+Thus saith the Lord God; Woe unto the foolish prophets, that follow their own spirit, and have seen nothing!
