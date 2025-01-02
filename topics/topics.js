@@ -1,20 +1,6 @@
 
 
-const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-const firstDate = new Date(2023, 9, 12);
 
-function getDaysSince(){
-    const secondDate = new Date();
-    const diffDays = Math.floor(Math.abs((firstDate - secondDate) / oneDay));
-    return diffDays
-}
-
-function getFormattedDate(){
-    const d = new Date();
-    const month = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()];
-    const year = d.getFullYear();
-    return month + ' ' + d.getDate() + ', ' + year;
-}
 
 const colorOfDay = [
     '#ACF39D',
@@ -56,7 +42,7 @@ try {
   text_data = await response.text();
 }
 catch {
-  text_data = "Ye cannot say, when ye are brought to that awful crisis, that I will repent, that I will return to my God. Nay, ye cannot say this; for that same spirit which doth possess your bodies at the time that ye go out of this life, that same spirit will have power to possess your body in that eternal world. (local)";
+  text_data = `Unable to find ${fileToGet}`;
 }
   
 el.textContent = text_data;
@@ -77,7 +63,7 @@ function unabbreviateBook(book){
       }
     }
   }
-  console.log("Abbreviated version not found");
+  console.log(`Abbreviated version not found for ${book}`);
   return book;
 }
 
@@ -95,9 +81,22 @@ function createDiv(classToAdd, typeToAdd, textToAdd='', idToAdd=''){
 
 
 
+
+function getAbbrevFromAbbrevVerse(abbrevVerse){
+  const regex = /(.*) ([0-9]+:[0-9])/;
+  const match = abbrevVerse.match(regex);
+  if (match) {
+    return match[1]
+  } else {
+    return "No match found"
+  }
+}
+
+
 function addVerseForTopic(verseToGet, counter){
-  const bookUnderscoreWithAbbrev = verseToGet.split(' ')[0];
-  const bookUnderscore = unabbreviateBook(bookUnderscoreWithAbbrev);
+  
+  const bookUnderscoreWithAbbrev = getAbbrevFromAbbrevVerse(verseToGet);
+  const bookUnderscore = unabbreviateBook(bookUnderscoreWithAbbrev).replace(" ", "_");
   verseToGet = verseToGet.replace(bookUnderscoreWithAbbrev, bookUnderscore);
 
   const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
@@ -105,7 +104,7 @@ function addVerseForTopic(verseToGet, counter){
   // create divs
   const parentDiv = createDiv('scrollable-verse', 'div', '', `verse_${counter}`);
   const verseLink = createDiv('verse-link', 'a');
-  const verseTitle = createDiv('verse-title', 'div', `${verseToGet} (${counter})`);
+  const verseTitle = createDiv('verse-title', 'div', `${verseToGet.replace("_", " ")} (${counter})`);
   const verseContent = createDiv('verse-content', 'div');
 
   // update div attributes
@@ -114,7 +113,14 @@ function addVerseForTopic(verseToGet, counter){
   const verseNumber = chapter_verse[1];
   const volumeText = bookUnderscore in bookToVolumeIdx ? volumeIdxToText[bookToVolumeIdx[bookUnderscore]] : "Book of Mormon"
 
-  updateDivToVerseText(verseContent, `/verses/${volumeText}/${bookUnderscore}/${chapterNumber}/${verseNumber}.txt`)
+  console.log('bookunderscore', bookUnderscore);
+
+  let verseFilepath = `/verses/${volumeText}/${bookUnderscore}/${chapterNumber}/${verseNumber}.txt`;
+  if (bookUnderscore == "D&C"){
+    verseFilepath = `/verses/Doctrine and Covenants/Doctrine_And_Covenants/${chapterNumber}/${verseNumber}.txt`
+  }
+
+  updateDivToVerseText(verseContent, verseFilepath)
 
   verseLink.href = `https://www.churchofjesuschrist.org/study/scriptures/bofm/${abbrevs[bookUnderscore]}/${chapterNumber}?lang=eng&id=p${verseNumber}#p${verseNumber}`
 
