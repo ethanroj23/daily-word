@@ -1,0 +1,30 @@
+
+
+.scrollable-verses-parent {
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll; /* Allow vertical scrolling */
+    scroll-snap-type: y mandatory; /* Enable scroll snapping in the vertical direction */
+    -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+    scroll-behavior: smooth;
+  }
+
+  .scrollable-verse {
+    height: 100%;
+    width: 100%; /* Adjust to your desired image size */
+    scroll-snap-align: start; /* Ensure images align at the start when snapped */
+    object-fit: cover; /* Optional: To make images fit the container without stretching */
+  }
+  
+  .verse-title {
+    font-weight: bold;
+  }
+
+  a {
+    text-decoration: unset;
+    color: unset;
+}
+
+.inner-body-header{
+  text-align: center;
+}

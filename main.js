@@ -74,12 +74,12 @@ function pageLoaded(){
     const bookUnderscore = verseToGet.split(' ')[0];
     const chapter_verse = verseToGet.split(' ')[1].split(':');
     const chapter = chapter_verse[0];
-    const verse = chapter_verse[1];
+    const verseNumber = chapter_verse[1];
 
     document.getElementById("verse_title").textContent = verseToGet.replace('_', ' ');
-    document.getElementById("verse_link").href = `https://www.churchofjesuschrist.org/study/scriptures/bofm/${abbrevs[bookUnderscore]}/${chapter}?lang=eng&id=p${verse}#p${verse}`
+    document.getElementById("verse_link").href = `https://www.churchofjesuschrist.org/study/scriptures/bofm/${abbrevs[bookUnderscore]}/${chapter}?lang=eng&id=p${verseNumber}#p${verseNumber}`
 
-    updateText(`/verses/Book of Mormon/${bookUnderscore}/${chapter}/${verse}.txt`)
+    updateText(`/verses/Book of Mormon/${bookUnderscore}/${chapter}/${verseNumber}.txt`)
     document.getElementById("date").textContent = curDate;
 
     // set background color
