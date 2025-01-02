@@ -1,4 +1,11 @@
 
+html{
+  font-size:16px;
+}
+
+body{
+  font-size: 4rem;
+}
 
 .scrollable-verses-parent {
     height: 100%;
