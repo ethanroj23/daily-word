@@ -6,6 +6,7 @@ html{
 
 /* Desktop */
 body {
+  margin: 0;
   font-size: 4rem;
   background-color: #2A2A2A;
 color: #B0BEC5;
@@ -61,8 +62,15 @@ color: #E4E4E4;
 
 
 
+.search-box{
+  width: 100%;
+  font-size: 4rem;
+  border-radius: 25px;
+}
 
-
+.hidden{
+  display:none;
+}
 
 
 
@@ -75,7 +83,7 @@ color: #E4E4E4;
     scroll-behavior: smooth;
   }
 
-  .scrollable-verse {
+  .scrollable-verse, .next-topic, .see-also {
     height: 100%;
     width: 95%; /* Adjust to your desired image size */
     scroll-snap-align: start; /* Ensure images align at the start when snapped */

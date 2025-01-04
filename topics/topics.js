@@ -14,7 +14,7 @@ const colorOfDay = [
 
 
 // Function to load JSON from a file
-function loadTopicsJSON(url) {
+function loadTopicsJSON(url, topic) {
   fetch(url)
       .then(response => {
           if (!response.ok) {
@@ -22,8 +22,11 @@ function loadTopicsJSON(url) {
           }
           return response.json();
       })
-      .then(topicalGuideVerses => {
+      .then(topicalGuideList => {
           let counter = 0;
+          const topicSeeAlso = topicalGuideList[0];
+          const topicalGuideVerses = topicalGuideList.slice(1)
+          if (topicSeeAlso.includes("See also")) addDivSeeAlso(topicSeeAlso);
           for (const verse of topicalGuideVerses){
             addVerseForTopic(verse, counter);
             counter += 1;
@@ -31,6 +34,7 @@ function loadTopicsJSON(url) {
           if (counter == 0){
             addDivExplainingNoVerses()
           }
+          addDivForNextTopic(topic)
           afterLoadingVerses();
       })
       .catch(error => {
@@ -67,9 +71,6 @@ function unabbreviateBook(book, counter){
   if (book.includes('.')){
     for (const volume in footnoteAbbrevs){
       for (const shortBook in footnoteAbbrevs[volume]){
-        if (book == '1 Cor.'){
-          console.log('shortBook', shortBook)
-        }
         if (shortBook == book){
           return footnoteAbbrevs[volume][shortBook];
         }
@@ -159,16 +160,86 @@ function addVerseForTopic(verseToGet, counter){
   scrollableVersesParent.appendChild(parentDiv);
 }
 
+function getNextTopic(topic){
+  let use_next = false;
+  for (const t of topics_list){
+    if (use_next){
+      return t;
+    }
+    if (t[0] == topic){
+      use_next = true;
+    }
+  }
+  return ["", "No topic next"];
+}
+
+function addDivForNextTopic(topic){
+  const nextTopic = getNextTopic(topic);
+  
+  const nextTopicDiv = createDiv('next-topic', 'div', `Up next: `);
+  const nextTopicLink = createDiv('next-topic', 'a', `${nextTopic[1]}`);
+  nextTopicLink.href = `/topics/?topic=${nextTopic[0]}`;
+
+  nextTopicDiv.appendChild(nextTopicLink)
+  const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
+  scrollableVersesParent.appendChild(nextTopicDiv);
+}
+
+function addDivSeeAlso(seeAlso){
+  const toSplit = seeAlso.replace("See also ", "");
+  const seeAlsoList = toSplit.split("; ")
+
+  const seeAlsoDiv = createDiv('see-also', 'div', "See also ")
+
+  for (const s of seeAlsoList){
+      const a = createDiv('see-also-inner', 'a', s+'; ');
+      a.href = `/topics/?topic=${topics_dict[s]}`;
+      seeAlsoDiv.appendChild(a);
+  }
+
+  const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
+  scrollableVersesParent.appendChild(seeAlsoDiv);
+}
+
 function addDivExplainingNoVerses(){
   const noVerses = createDiv('no-verses', 'div', 'There are no verses for this topic')
   const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
   scrollableVersesParent.appendChild(noVerses);
 }
 
+function addSearchListener(){
+  // Get references to the input box and the list items
+  const searchBox = document.getElementById('search_box');
+  const listItems = document.querySelectorAll('.toc-topic');
+  
+  // Function to filter the list based on user input
+  searchBox.addEventListener('input', function() {
+    const searchTerm = searchBox.value.toLowerCase();  // Convert to lowercase for case-insensitive matching
+  
+    listItems.forEach(function(item) {
+      const itemText = item.textContent.toLowerCase();
+      if (itemText.includes(searchTerm)) {
+        item.classList.remove('hidden');  // Show item
+      } else {
+        item.classList.add('hidden');  // Hide item
+      }
+    });
+  });
+}
+
+function addDivForSearch(){
+  const search = createDiv('search-box', 'input', '', 'search_box');
+  search.placeholder = "Search..."
+  search.type = "text";
+
+  const scrollableVersesParent = document.getElementById('toc_parent');
+  scrollableVersesParent.prepend(search);
+}
+
 function addDivForTopic(topic){
   const tocTopic = createDiv('toc-topic', 'div');
-  const tocTopicA = createDiv('toc-topic-a', 'a', topic);
-  tocTopicA.href = `/topics/?topic=${topic}`;
+  const tocTopicA = createDiv('toc-topic-a', 'a', topic[1]);
+  tocTopicA.href = `/topics/?topic=${topic[0]}`;
   const tocParent = document.getElementById('toc_parent');
   tocTopic.appendChild(tocTopicA);
   tocParent.appendChild(tocTopic);
@@ -185,17 +256,19 @@ function afterLoadingVerses(){
 }
 
 function setupTopicListPage(){
-  fetch('/topics/topics_list.json')
-  .then(response => {
-      if (!response.ok) {throw new Error('Failed to load JSON file');}
-      return response.json();
-  })
-  .then(topics => {
-      for (const topic of topics){
+      addDivForSearch();
+      for (const topic of topics_list){
         addDivForTopic(topic);
       }
-  })
-  .catch(error => {console.error('Error loading JSON:', error);});
+      addSearchListener();
+}
+
+function getTopicDisplayName(topic){
+  for (const t of topics_list){
+    if (t[0] == topic){
+      return t[1];
+    }
+  }
 }
 
 //onload
@@ -208,14 +281,19 @@ function pageLoaded() {
     const topic = params.get('topic')
     const header_link = document.getElementById("inner_body_header_link")
     header_link.classList.add('roboto-medium');
-    header_link.textContent = topic;
+    header_link.textContent = getTopicDisplayName(topic);
     header_link.href = `https://www.churchofjesuschrist.org/study/scriptures/tg/${topic}?lang=eng`;
-    loadTopicsJSON(`/topics/data/${topic}.json`)
+    loadTopicsJSON(`/topics/data/${topic}.json`, topic)
   }
   else{
     setupTopicListPage()
   }
 }
+
+
+
+
+
 
 
 
