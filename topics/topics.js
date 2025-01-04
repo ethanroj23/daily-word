@@ -13,20 +13,35 @@ const colorOfDay = [
 ]
 
 
-
-
-
-function httpGetAsync(theUrl, callback)
-{
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = function() { 
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            callback(xmlHttp.responseText);
-    }
-    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-    xmlHttp.send(null);
-    
+// Function to load JSON from a file
+function loadTopicsJSON(url) {
+  fetch(url)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Failed to load JSON file');
+          }
+          return response.json();
+      })
+      .then(topicalGuideVerses => {
+          let counter = 0;
+          for (const verse of topicalGuideVerses){
+            addVerseForTopic(verse, counter);
+            counter += 1;
+          }
+          if (counter == 0){
+            addDivExplainingNoVerses()
+          }
+          afterLoadingVerses();
+      })
+      .catch(error => {
+          console.error('Error loading JSON:', error);
+      });
 }
+
+
+
+
+
 
 function httpCallback(response){
   alert(response)
@@ -44,26 +59,24 @@ try {
 catch {
   text_data = `Unable to find ${fileToGet}`;
 }
-  
 el.textContent = text_data;
 }
 
 
-
-
-
-
-function unabbreviateBook(book){
+function unabbreviateBook(book, counter){
   if (book.includes('.')){
     for (const volume in footnoteAbbrevs){
       for (const shortBook in footnoteAbbrevs[volume]){
+        if (book == '1 Cor.'){
+          console.log('shortBook', shortBook)
+        }
         if (shortBook == book){
           return footnoteAbbrevs[volume][shortBook];
         }
       }
     }
+    console.log(`Abbreviated version not found for ${book} - ${counter}`);
   }
-  console.log(`Abbreviated version not found for ${book}`);
   return book;
 }
 
@@ -79,11 +92,8 @@ function createDiv(classToAdd, typeToAdd, textToAdd='', idToAdd=''){
   return newDiv;
 }
 
-
-
-
 function getAbbrevFromAbbrevVerse(abbrevVerse){
-  const regex = /(.*) ([0-9]+:[0-9])/;
+  const regex = /(.*?) ([0-9]+:[0-9])/;
   const match = abbrevVerse.match(regex);
   if (match) {
     return match[1]
@@ -93,10 +103,27 @@ function getAbbrevFromAbbrevVerse(abbrevVerse){
 }
 
 
+const volumeIdxToUrlSection = [
+  'ot',
+  'nt',
+  'bofm',
+  'dc-testament',
+  'pgp',
+]
+
+function getVerseLink(volumeIdx, bookUnderscore, chapterNumber, verseNumber){
+  const baseUrl = 'https://www.churchofjesuschrist.org/study/scriptures'
+  if (bookUnderscore == "D&C"){
+    return `${baseUrl}/${volumeIdxToUrlSection[volumeIdx]}/dc/${chapterNumber}?lang=eng&id=p${verseNumber}#p${verseNumber}`
+  }
+
+  return `${baseUrl}/${volumeIdxToUrlSection[volumeIdx]}/${urlAbbrevs[bookUnderscore]}/${chapterNumber}?lang=eng&id=p${verseNumber}#p${verseNumber}`
+}
+
 function addVerseForTopic(verseToGet, counter){
   
   const bookUnderscoreWithAbbrev = getAbbrevFromAbbrevVerse(verseToGet);
-  const bookUnderscore = unabbreviateBook(bookUnderscoreWithAbbrev).replace(" ", "_");
+  const bookUnderscore = unabbreviateBook(bookUnderscoreWithAbbrev, counter).replace(" ", "_");
   verseToGet = verseToGet.replace(bookUnderscoreWithAbbrev, bookUnderscore);
 
   const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
@@ -104,16 +131,16 @@ function addVerseForTopic(verseToGet, counter){
   // create divs
   const parentDiv = createDiv('scrollable-verse', 'div', '', `verse_${counter}`);
   const verseLink = createDiv('verse-link', 'a');
-  const verseTitle = createDiv('verse-title', 'div', `${verseToGet.replace("_", " ")} (${counter})`);
+  const verseTitle = createDiv('verse-title', 'div', `${verseToGet.replace("_", " ")}`);
+  verseTitle.classList.add('roboto-medium');
   const verseContent = createDiv('verse-content', 'div');
 
   // update div attributes
   const chapter_verse = verseToGet.split(' ')[1].split(':');
   const chapterNumber = chapter_verse[0];
   const verseNumber = chapter_verse[1];
-  const volumeText = bookUnderscore in bookToVolumeIdx ? volumeIdxToText[bookToVolumeIdx[bookUnderscore]] : "Book of Mormon"
-
-  console.log('bookunderscore', bookUnderscore);
+  const volumeIdx = bookToVolumeIdx[bookUnderscore]
+  const volumeText = bookUnderscore in bookToVolumeIdx ? volumeIdxToText[volumeIdx] : "Book of Mormon"
 
   let verseFilepath = `/verses/${volumeText}/${bookUnderscore}/${chapterNumber}/${verseNumber}.txt`;
   if (bookUnderscore == "D&C"){
@@ -122,7 +149,8 @@ function addVerseForTopic(verseToGet, counter){
 
   updateDivToVerseText(verseContent, verseFilepath)
 
-  verseLink.href = `https://www.churchofjesuschrist.org/study/scriptures/bofm/${abbrevs[bookUnderscore]}/${chapterNumber}?lang=eng&id=p${verseNumber}#p${verseNumber}`
+  verseLink.href = getVerseLink(volumeIdx, bookUnderscore, chapterNumber, verseNumber)
+
 
   // create hierarchy of divs
   verseLink.appendChild(verseTitle)
@@ -131,29 +159,62 @@ function addVerseForTopic(verseToGet, counter){
   scrollableVersesParent.appendChild(parentDiv);
 }
 
+function addDivExplainingNoVerses(){
+  const noVerses = createDiv('no-verses', 'div', 'There are no verses for this topic')
+  const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
+  scrollableVersesParent.appendChild(noVerses);
+}
+
+function addDivForTopic(topic){
+  const tocTopic = createDiv('toc-topic', 'div');
+  const tocTopicA = createDiv('toc-topic-a', 'a', topic);
+  tocTopicA.href = `/topics/?topic=${topic}`;
+  const tocParent = document.getElementById('toc_parent');
+  tocTopic.appendChild(tocTopicA);
+  tocParent.appendChild(tocTopic);
+}
 
 
-function pageLoaded() {
-  console.log("pageLoaded")
-  // TODO:  Try to figure out this part later if you want
-  //httpGetAsync("https://www.churchofjesuschrist.org/study/scriptures/tg/abide?lang=eng", httpCallback)
-  console.log("after pageLoaded")
-  document.getElementById("inner_body_header").textContent = "God the Father";
 
-
-  let counter = 0;
-  for (const verse of godTheFatherTopicalGuide){
-    addVerseForTopic(verse, counter);
-    counter += 1;
-  }
-
+function afterLoadingVerses(){
   const params = new URLSearchParams(window.location.search);
   if (params.has('last_read')){
     const last_read = params.get('last_read');
-    console.log(last_read);
     document.getElementById(last_read).scrollIntoView();
   }
+}
 
+function setupTopicListPage(){
+  fetch('/topics/topics_list.json')
+  .then(response => {
+      if (!response.ok) {throw new Error('Failed to load JSON file');}
+      return response.json();
+  })
+  .then(topics => {
+      for (const topic of topics){
+        addDivForTopic(topic);
+      }
+  })
+  .catch(error => {console.error('Error loading JSON:', error);});
+}
+
+//onload
+function pageLoaded() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('colormode')){
+    document.body.classList.add(`dark-mode-${params.get('colormode')}`);
+  }
+  if (params.has('topic')){
+    const topic = params.get('topic')
+    const header_link = document.getElementById("inner_body_header_link")
+    header_link.classList.add('roboto-medium');
+    header_link.textContent = topic;
+    header_link.href = `https://www.churchofjesuschrist.org/study/scriptures/tg/${topic}?lang=eng`;
+    loadTopicsJSON(`/topics/data/${topic}.json`)
+  }
+  else{
+    setupTopicListPage()
+  }
 }
 
 
@@ -397,23 +458,103 @@ const bookToVolumeIdx = {
 
 
 
-const abbrevs = {
-  '1_Nephi': '1-ne',
-  '2_Nephi': '2-ne',
-  '3_Nephi': '3-ne',
-  '4_Nephi': '4-ne',
-  'Alma': 'alma',
-  'Enos': 'enos',
-  'Ether': 'ether',
-  'Helaman': 'hel',
-  'Jacob': 'jacob',
-  'Jarom': 'jarom',
-  'Mormon': 'morm',
-  'Moroni': 'moro',
-  'Mosiah': 'mosiah',
-  'Omni': 'omni',
-  'Words_of_Mormon': 'w-of-m',
+const urlAbbrevs = {
+  "Genesis": "gen",
+  "Exodus": "ex",
+  "Leviticus": "lev",
+  "Numbers": "num",
+  "Deuteronomy": "deut",
+  "Joshua": "josh",
+  "Judges": "judg",
+  "Ruth": "ruth",
+  "1_Samuel": "1-sam",
+  "2_Samuel": "2-sam",
+  "1_Kings": "1-kgs",
+  "2_Kings": "2-kgs",
+  "1_Chronicles": "1-chr",
+  "2_Chronicles": "2-chr",
+  "Ezra": "ezra",
+  "Nehemiah": "neh",
+  "Esther": "esth",
+  "Job": "job",
+  "Psalms": "ps",
+  "Proverbs": "prov",
+  "Ecclesiastes": "eccl",
+  "Solomons_Song": "song",
+  "Isaiah": "isa",
+  "Jeremiah": "jer",
+  "Lamentations": "lam",
+  "Ezekiel": "ezek",
+  "Daniel": "dan",
+  "Hosea": "hosea",
+  "Joel": "joel",
+  "Amos": "amos",
+  "Obadiah": "obad",
+  "Jonah": "jonah",
+  "Micah": "micah",
+  "Nahum": "nahum",
+  "Habakkuk": "hab",
+  "Zephaniah": "zeph",
+  "Haggai": "hag",
+  "Zechariah": "zech",
+  "Malachi": "mal",
+ 
+  "Matthew": "matt",
+  "Mark": "mark",
+  "Luke": "luke",
+  "John": "john",
+  "Acts": "acts",
+  "Romans": "rom",
+  "1_Corinthians": "1-cor",
+  "2_Corinthians": "2-cor",
+  "Galatians": "gal",
+  "Ephesians": "eph",
+  "Philippians": "philip",
+  "Colossians": "col",
+  "1_Thessalonians": "1-thes",
+  "2_Thessalonians": "2-thes",
+  "1_Timothy": "1-tim",
+  "2_Timothy": "2-tim",
+  "Titus": "titus",
+  "Philemon": "philem",
+  "Hebrews": "heb",
+  "James": "james",
+  "1_Peter": "1-pet",
+  "2_Peter": "2-pet",
+  "1_John": "1-jn",
+  "2_John": "2-jn",
+  "3_John": "3-jn",
+  "Jude": "jude",
+  "Revelation": "rev",
+ 
+  "1_Nephi": "1-ne",
+  "2_Nephi": "2-ne",
+  "Jacob": "jacob",
+  "enos": "enos",
+  "Jarom": "jarom",
+  "Omni": "omni",
+  "Words_of_Mormon": "w-of-m",
+  "Mosiah": "mosiah",
+  "Alma": "alma",
+  "Helaman": "hel",
+  "3_Nephi": "3-ne",
+  "4_Nephi": "4-ne",
+  "Mormon": "morm",
+  "Ether": "ether",
+  "Moroni": "moro",
+ 
+ 
+  "Moses": "moses",
+  "Abraham": "abr",
+  "Joseph_Smith_Matthew": "js-m",
+  "Joseph_Smith_History": "js-h",
+  "Articles_of_Faith": "a-of-f",
   }
+
+  
+
+
+
 
 
 const footnoteAbbrevs = {
@@ -518,108 +659,3 @@ const footnoteAbbrevs = {
 
 
 
-const godTheFatherTopicalGuide = [
-"Gen. 14:19",
-"Num. 16:22 (27:16)",
-"Mal. 2:10",
-"Matt. 3:17",
-"Matt. 5:16",
-"Matt. 5:48",
-"Matt. 6:6 (3 Ne. 13:6)",
-"Matt. 6:9 (Luke 11:2; 3 Ne. 13:9)",
-"Matt. 6:15 (Mark 11:26; 3 Ne. 13:15)",
-"Matt. 7:21 (3 Ne. 14:21)",
-"Matt. 10:32",
-"Matt. 11:27 (Luke 10:22)",
-"Matt. 12:50",
-"Matt. 16:17",
-"Matt. 17:5",
-"Matt. 18:10",
-"Matt. 20:23",
-"Matt. 23:9",
-"Matt. 24:36 (Mark 13:32; JS—M 1:40)",
-"Matt. 26:39 (Luke 22:42)",
-"Matt. 28:19",
-"Luke 2:49",
-"Luke 6:36",
-"Luke 23:34",
-"Luke 23:46",
-"Luke 24:49",
-"John 1:14",
-"John 2:16",
-"John 3:16",
-"John 3:35 (5:20)",
-"John 4:23",
-"John 5:18",
-"John 5:19",
-"John 5:30",
-"John 5:37 (8:18)",
-"John 5:43 (10:25)",
-"John 6:37",
-"John 6:45",
-"John 8:18",
-"John 8:28",
-"John 8:54",
-"John 10:15",
-"John 10:30",
-"John 12:26",
-"John 12:49",
-"John 14:2",
-"John 14:6",
-"John 14:9",
-"John 14:10 (14:20; D&C 93:3)",
-"John 14:12 (14:28; 16:16)",
-"John 14:28",
-"John 15:1",
-"John 15:16 (16:23)",
-"John 15:23",
-"John 16:3",
-"John 16:15",
-"John 16:28",
-"John 16:32",
-"John 17:21",
-"John 20:17",
-"John 20:21",
-"Acts 7:56",
-"Rom. 8:15",
-"Rom. 15:6",
-"1 Cor. 8:6",
-"1 Cor. 11:13",
-"Eph. 2:18",
-"Eph. 3:14",
-"Eph. 4:6",
-"Heb. 1:5",
-"Heb. 12:9",
-"James 1:17",
-"1 Jn. 1:3",
-"1 Jn. 2:1",
-"1 Jn. 2:15",
-"1 Jn. 4:14",
-"1 Jn. 5:7",
-"2 Jn. 1:9",
-"Rev. 3:5",
-"1 Ne. 11:21",
-"2 Ne. 31:21",
-"Alma 11:44",
-"3 Ne. 11:25",
-"3 Ne. 18:27",
-"Morm. 7:7",
-"D&C 15:6",
-"D&C 20:24",
-"D&C 27:14",
-"D&C 63:34",
-"D&C 76:20",
-"D&C 84:63",
-"D&C 84:83",
-"D&C 88:75",
-"D&C 93:17",
-"D&C 121:32",
-"D&C 130:22",
-"D&C 137:3",
-"D&C 138:14",
-"Moses 4:2",
-"Abr. 3:19",
-"Abr. 3:27",
-"JS—H 1:17",
-"A of F 1:1",
-  ]
