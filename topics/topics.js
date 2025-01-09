@@ -173,6 +173,15 @@ function getNextTopic(topic){
   return ["", "No topic next"];
 }
 
+
+
+
+
+
+
+
+
+
 function addDivForNextTopic(topic){
   const nextTopic = getNextTopic(topic);
   
@@ -183,6 +192,9 @@ function addDivForNextTopic(topic){
   nextTopicDiv.appendChild(nextTopicLink)
   const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
   scrollableVersesParent.appendChild(nextTopicDiv);
+
+  const loadNextTopicDiv = createDiv('load-next-topic', 'div');
+  scrollableVersesParent.appendChild(loadNextTopicDiv);
 }
 
 function addDivSeeAlso(seeAlso){
@@ -263,6 +275,8 @@ function setupTopicListPage(){
       addSearchListener();
 }
 
+let screenHeight = window.innerHeight;
+
 function getTopicDisplayName(topic){
   for (const t of topics_list){
     if (t[0] == topic){
@@ -288,6 +302,23 @@ function pageLoaded() {
   else{
     setupTopicListPage()
   }
+
+
+  const scrollDiv = document.getElementById('scrollable_verses_parent');
+let scrollTimeout;
+scrollDiv.addEventListener('scroll', function() {
+    clearTimeout(scrollTimeout);
+
+    scrollTimeout = setTimeout(function() {
+        console.log('Scrolling stopped!');
+        const div = document.querySelector('.load-next-topic');
+        const rect = div.getBoundingClientRect();
+        console.log(rect.top);
+        if (rect.top < screenHeight){
+          window.location.href = document.querySelector('a.next-topic').href;
+        }
+    }, 200); // 200ms delay (you can adjust this value)
+});
 }
 
 

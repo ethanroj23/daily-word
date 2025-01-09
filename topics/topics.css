@@ -83,7 +83,7 @@ color: #E4E4E4;
     scroll-behavior: smooth;
   }
 
-  .scrollable-verse, .next-topic, .see-also {
+  .scrollable-verse, .next-topic, .see-also, .load-next-topic {
     height: 100%;
     width: 95%; /* Adjust to your desired image size */
     scroll-snap-align: start; /* Ensure images align at the start when snapped */
