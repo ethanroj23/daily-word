@@ -1,5 +1,25 @@
 
 
+let allVerseDivs;
+let globalLastRead = {};
+
+// Localstorage stuff
+
+function setLocalStorageDict(name, dict){
+  localStorage.setItem(name, JSON.stringify(dict));
+}
+
+function getLocalStorageDict(name){
+  const retrievedItem = localStorage.getItem(name);
+  if (retrievedItem) {
+    const retrievedDict = JSON.parse(retrievedItem);
+    return retrievedDict;
+  } else {
+    return {};
+  }
+}
+
+
 
 
 const colorOfDay = [
@@ -160,15 +180,20 @@ function addVerseForTopic(verseToGet, counter){
   scrollableVersesParent.appendChild(parentDiv);
 }
 
+let topicIdx;
+
 function getNextTopic(topic){
   let use_next = false;
+  let counter = 0;
   for (const t of topics_list){
     if (use_next){
       return t;
     }
     if (t[0] == topic){
       use_next = true;
+      topicIdx = counter;
     }
+    counter += 1;
   }
   return ["", "No topic next"];
 }
@@ -261,10 +286,19 @@ function addDivForTopic(topic){
 
 function afterLoadingVerses(){
   const params = new URLSearchParams(window.location.search);
+  globalLastRead = getLocalStorageDict('lastReadVerse');
   if (params.has('last_read')){
     const last_read = params.get('last_read');
     document.getElementById(last_read).scrollIntoView();
   }
+  else{
+    if (topicIdx in globalLastRead){
+      const last_read = globalLastRead[topicIdx];
+      document.getElementById(last_read).scrollIntoView();
+    }
+  }
+
+  allVerseDivs = document.querySelectorAll('.scrollable-verse');
 }
 
 function setupTopicListPage(){
@@ -285,6 +319,18 @@ function getTopicDisplayName(topic){
   }
 }
 
+function addHomeButton(){
+    const homeButton = createDiv('home-button', 'a')
+    const homeButtonSpacer = createDiv('home-button-spacer', 'div')
+    homeButton.textContent = String.fromCharCode(8801);
+    homeButton.href = "/topics/"
+    homeButtonSpacer.textContent = String.fromCharCode(8801);
+    const parent = document.getElementById('inner_body_header');
+    const child = document.getElementById('inner_body_header_link');
+    parent.insertBefore(homeButton, child);
+    parent.appendChild(homeButtonSpacer);
+}
+
 //onload
 function pageLoaded() {
   const params = new URLSearchParams(window.location.search);
@@ -297,6 +343,8 @@ function pageLoaded() {
     header_link.classList.add('roboto-medium');
     header_link.textContent = getTopicDisplayName(topic);
     header_link.href = `https://www.churchofjesuschrist.org/study/scriptures/tg/${topic}?lang=eng`;
+
+    addHomeButton();
     loadTopicsJSON(`/topics/data/${topic}.json`, topic)
   }
   else{
@@ -304,13 +352,26 @@ function pageLoaded() {
   }
 
 
-  const scrollDiv = document.getElementById('scrollable_verses_parent');
+  function checkVisibility() {
+    for (const item of allVerseDivs) {
+      const rect = item.getBoundingClientRect();
+      if (rect.top >= 0) {
+        return item.id;
+      }
+    };
+  }
+
+const scrollDiv = document.getElementById('scrollable_verses_parent');
 let scrollTimeout;
 scrollDiv.addEventListener('scroll', function() {
     clearTimeout(scrollTimeout);
 
     scrollTimeout = setTimeout(function() {
         console.log('Scrolling stopped!');
+        const lastReadVerse = checkVisibility();
+
+        globalLastRead[topicIdx] = lastReadVerse;
+        setLocalStorageDict('lastReadVerse', globalLastRead);
         const div = document.querySelector('.load-next-topic');
         const rect = div.getBoundingClientRect();
         console.log(rect.top);
@@ -320,7 +381,6 @@ scrollDiv.addEventListener('scroll', function() {
     }, 200); // 200ms delay (you can adjust this value)
 });
 }
-
 
 
 
