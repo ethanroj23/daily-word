@@ -63,6 +63,8 @@ color: #E4E4E4;
   display: flex; 
   justify-content: space-between; 
   align-items: center; 
+  position: sticky;
+  height:7vh;
 }
 
 .home-button, .home-button-spacer {
@@ -94,7 +96,7 @@ color: #E4E4E4;
 
 
 .scrollable-verses-parent {
-    height: 100%;
+    height: 93vh;
     width: 100%;
     overflow-y: scroll; /* Allow vertical scrolling */
     scroll-snap-type: y mandatory; /* Enable scroll snapping in the vertical direction */
