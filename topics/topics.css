@@ -71,6 +71,15 @@ color: #E4E4E4;
   height:7vh;
 }
 
+.save-button{
+  height:100%;
+  aspect-ratio:1;
+  opacity:0.25;
+}
+
+.home-page-item{
+  margin-left:5%;
+}
 
 .home-button-spacer{
   color:#ffffff00;

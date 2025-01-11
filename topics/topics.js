@@ -36,6 +36,16 @@ function getLocalStorageDict(name){
   }
 }
 
+function getLocalStorageList(name){
+  const retrievedItem = localStorage.getItem(name);
+  if (retrievedItem) {
+    const retrievedDict = JSON.parse(retrievedItem);
+    return retrievedDict;
+  } else {
+    return [];
+  }
+}
+
 
 
 
@@ -61,14 +71,18 @@ function loadTopicsJSON(url, topic) {
       })
       .then(topicalGuideList => {
           let counter = 0;
+          let hasSeeAlso = false;
           const topicSeeAlso = topicalGuideList[0];
           const topicalGuideVerses = topicalGuideList.slice(1)
-          if (topicSeeAlso.includes("See also")) addDivSeeAlso(topicSeeAlso);
+          if (topicSeeAlso.includes("See ")) {
+            hasSeeAlso = true;
+            addDivSeeAlso(topicSeeAlso);
+          }
           for (const verse of topicalGuideVerses){
             addVerseForTopic(verse, counter);
             counter += 1;
           }
-          if (counter == 0){
+          if (counter == 0 && !hasSeeAlso){
             addDivExplainingNoVerses()
           }
           addDivForNextTopic(topic)
@@ -240,7 +254,7 @@ function addDivForNextTopic(topic){
 }
 
 function addDivSeeAlso(seeAlso){
-  const toSplit = seeAlso.replace("See also ", "");
+  const toSplit = seeAlso.replace("See also ", "").replace("See ", "");
   const seeAlsoList = toSplit.split("; ")
 
   const seeAlsoDiv = createDiv('scrollable-verse', 'div')
@@ -259,6 +273,7 @@ function addDivSeeAlso(seeAlso){
 
 function addDivExplainingNoVerses(){
   const noVerses = createDiv('no-verses', 'div', 'There are no verses for this topic')
+  noVerses.classList.add("scrollable-verse");
   const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
   scrollableVersesParent.appendChild(noVerses);
 }
@@ -337,6 +352,12 @@ function addDivForThemePicker(){
   scrollableVersesParent.prepend(themePicker);
 }
 
+function addHomePageSection(text){
+  const recentlyRead = createDiv('home-page-section', 'div', text);
+  const scrollableVersesParent = document.getElementById('toc_parent');
+  scrollableVersesParent.appendChild(recentlyRead);
+}
+
 function addDivForTopic(topic){
   const tocTopic = createDiv('toc-topic', 'div');
   const tocTopicA = createDiv('toc-topic-a', 'a', topic[1]);
@@ -344,6 +365,8 @@ function addDivForTopic(topic){
   const tocParent = document.getElementById('toc_parent');
   tocTopic.appendChild(tocTopicA);
   tocParent.appendChild(tocTopic);
+  tocTopic.classList.add("home-page-item")
+  return tocTopic;
 }
 
 
@@ -371,6 +394,20 @@ function afterLoadingVerses(){
 function setupTopicListPage(){
       addDivForSearch();
       addDivForThemePicker();
+      const recents = getLocalStorageList('recently_read');
+      const saved = getLocalStorageList('saved');
+      if (recents) addHomePageSection('Recents');
+      for (const topic of recents){
+        const topicWithDisplayname = [topic, getTopicDisplayName(topic)];
+        addDivForTopic(topicWithDisplayname);
+      }
+      if (saved) addHomePageSection('Saved');
+      for (const topic of saved){
+        const topicWithDisplayname = [topic, getTopicDisplayName(topic)];
+        addDivForTopic(topicWithDisplayname);
+      }
+
+      addHomePageSection('All Topics');
       for (const topic of topics_list){
         addDivForTopic(topic);
       }
@@ -387,28 +424,62 @@ function getTopicDisplayName(topic){
   }
 }
 
+function removeFromList(inputList, value){
+let index = inputList.indexOf(value);
+  if (index !== -1) {
+    inputList.splice(index, 1);
+  }
+}
+
+
+
 function addHomeButton(){
     const homeButton = createDiv('home-button', 'a')
-    const homeButtonSpacer = createDiv('home-button-spacer', 'div')
+    const saveButton = createDiv('save-button', 'img')
     homeButton.href = "/topics/"
     const homeLogo = createDiv('home-logo', 'img');
     homeLogo.src = "/icons/tg192transparent.png";
-    homeButtonSpacer.src = "/icons/tg192transparent.png";
+    saveButton.src = getLocalStorageList('saved').includes(globalTopic) ? "/icons/saved.png" : "/icons/save.png";
     homeButton.appendChild(homeLogo);
+
+    saveButton.onclick = function() {
+      const isSaved = getLocalStorageList('saved');
+      const topic = topics_list[topicIdx][0]
+      if (isSaved.includes(topic)){
+        this.src = "/icons/save.png";
+        removeFromList(isSaved, topic);
+      }
+      else{
+        this.src = "/icons/saved.png";
+        isSaved.unshift(topic);
+      }
+      setLocalStorageDict('saved', isSaved);
+    }
 
     const parent = document.getElementById('inner_body_header');
     const child = document.getElementById('inner_body_header_link');
     parent.insertBefore(homeButton, child);
-    parent.appendChild(homeButtonSpacer);
+    parent.appendChild(saveButton);
 }
 
+let globalTopic;
 //onload
 function pageLoaded() {
   const params = new URLSearchParams(window.location.search);
   if (params.has('topic')){
     document.body.className = initTheme();
-
+    
     const topic = params.get('topic')
+    globalTopic = topic;
+
+    const recentlyRead = getLocalStorageList('recently_read');
+    if (recentlyRead.includes(topic)){
+      removeFromList(recentlyRead, topic);
+    }
+    recentlyRead.unshift(topic);
+    recentlyRead.splice(5);
+    setLocalStorageDict('recently_read', recentlyRead);
+
     const header_link = document.getElementById("inner_body_header_link")
     header_link.classList.add('roboto-medium');
     header_link.textContent = getTopicDisplayName(topic);
@@ -476,9 +547,7 @@ var getSelectedRange = function() {
 };
 
 
-function highlightFromLS(start, end, color, wait) {
-  
-}
+
 
 
 function highlightSelectedText(color, add=true) {
