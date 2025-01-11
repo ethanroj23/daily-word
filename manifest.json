@@ -1,0 +1,22 @@
+{
+    "name": "Topical Guide",
+    "short_name": "TopicalGuide",
+    "description": "A way to study the topical guide",
+    "start_url": "/topics/",
+    "display": "standalone", 
+    "background_color": "#ffffff",
+    "theme_color": "#007aff", 
+    "icons": [
+      {
+        "src": "icons/tg192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "icons/tg512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  
