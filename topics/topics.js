@@ -3,7 +3,24 @@
 let allVerseDivs;
 let globalLastRead = {};
 
+let themes = [
+"dark-mode-midnight",
+"dark-mode-classic",
+"dark-mode-charcoal",
+"dark-mode-deep-space",
+"dark-mode-slate",
+"dark-mode-elegant",
+]
+
 // Localstorage stuff
+
+function setLocalStorageString(name, value){
+  localStorage.setItem(name, value);
+}
+
+function getLocalStorageString(name){
+  return localStorage.getItem(name);
+}
 
 function setLocalStorageDict(name, dict){
   localStorage.setItem(name, JSON.stringify(dict));
@@ -150,7 +167,7 @@ function addVerseForTopic(verseToGet, counter){
   const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
 
   // create divs
-  const parentDiv = createDiv('scrollable-verse', 'div', '', `verse_${counter}`);
+  const scrollableVerseDiv = createDiv('scrollable-verse', 'div', '', `verse_${counter}`);
   const verseLink = createDiv('verse-link', 'a');
   const verseTitle = createDiv('verse-title', 'div', `${verseToGet.replace("_", " ")}`);
   verseTitle.classList.add('roboto-medium');
@@ -175,9 +192,9 @@ function addVerseForTopic(verseToGet, counter){
 
   // create hierarchy of divs
   verseLink.appendChild(verseTitle)
-  parentDiv.appendChild(verseLink);
-  parentDiv.appendChild(verseContent);
-  scrollableVersesParent.appendChild(parentDiv);
+  scrollableVerseDiv.appendChild(verseLink);
+  scrollableVerseDiv.appendChild(verseContent);
+  scrollableVersesParent.appendChild(scrollableVerseDiv);
 }
 
 let topicIdx;
@@ -226,15 +243,17 @@ function addDivSeeAlso(seeAlso){
   const toSplit = seeAlso.replace("See also ", "");
   const seeAlsoList = toSplit.split("; ")
 
-  const seeAlsoDiv = createDiv('see-also', 'div', "See also ")
+  const seeAlsoDiv = createDiv('scrollable-verse', 'div')
+  const seeAlsoContentDiv = createDiv('verse-content', 'div', "See also ")
 
   for (const s of seeAlsoList){
       const a = createDiv('see-also-inner', 'a', s+'; ');
       a.href = `/topics/?topic=${topics_dict[s]}`;
-      seeAlsoDiv.appendChild(a);
+      seeAlsoContentDiv.appendChild(a);
   }
 
   const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
+  seeAlsoDiv.appendChild(seeAlsoContentDiv);
   scrollableVersesParent.appendChild(seeAlsoDiv);
 }
 
@@ -273,6 +292,51 @@ function addDivForSearch(){
   scrollableVersesParent.prepend(search);
 }
 
+function themePickerOnclick(){
+  this.className = "theme-picker";
+  let nextTheme = themes[0];
+  let useNext = false;
+  for (const theme of themes){
+    if (useNext){
+      nextTheme = theme;
+      break;
+    }
+    if (theme == currentTheme){
+      useNext = true;
+    }
+  }
+
+  currentTheme = nextTheme;
+  setLocalStorageString('theme', currentTheme);
+  this.classList.add(currentTheme)
+  document.body.className = currentTheme;
+}
+
+let currentTheme;
+
+function initTheme(){
+  const savedTheme = getLocalStorageString('theme');
+  if (savedTheme){
+    currentTheme = savedTheme;
+  }
+  else{
+    currentTheme = themes[0];
+  }
+  return currentTheme;
+}
+
+function addDivForThemePicker(){
+  const themePicker = createDiv('theme-picker', 'div', 'Change Theme');
+  const currentTheme = initTheme();
+  themePicker.classList.add(currentTheme);
+  document.body.classList.add(currentTheme);
+  themePicker.onclick = themePickerOnclick;
+
+
+  const scrollableVersesParent = document.getElementById('toc_parent');
+  scrollableVersesParent.prepend(themePicker);
+}
+
 function addDivForTopic(topic){
   const tocTopic = createDiv('toc-topic', 'div');
   const tocTopicA = createDiv('toc-topic-a', 'a', topic[1]);
@@ -294,7 +358,10 @@ function afterLoadingVerses(){
   else{
     if (topicIdx in globalLastRead){
       const last_read = globalLastRead[topicIdx];
-      document.getElementById(last_read).scrollIntoView();
+      const last_read_div = document.getElementById(last_read);
+      if (last_read_div){
+        last_read_div.scrollIntoView();
+      }
     }
   }
 
@@ -303,6 +370,7 @@ function afterLoadingVerses(){
 
 function setupTopicListPage(){
       addDivForSearch();
+      addDivForThemePicker();
       for (const topic of topics_list){
         addDivForTopic(topic);
       }
@@ -322,9 +390,12 @@ function getTopicDisplayName(topic){
 function addHomeButton(){
     const homeButton = createDiv('home-button', 'a')
     const homeButtonSpacer = createDiv('home-button-spacer', 'div')
-    homeButton.textContent = String.fromCharCode(8801);
     homeButton.href = "/topics/"
-    homeButtonSpacer.textContent = String.fromCharCode(8801);
+    const homeLogo = createDiv('home-logo', 'img');
+    homeLogo.src = "/icons/tg192transparent.png";
+    homeButtonSpacer.src = "/icons/tg192transparent.png";
+    homeButton.appendChild(homeLogo);
+
     const parent = document.getElementById('inner_body_header');
     const child = document.getElementById('inner_body_header_link');
     parent.insertBefore(homeButton, child);
@@ -334,10 +405,9 @@ function addHomeButton(){
 //onload
 function pageLoaded() {
   const params = new URLSearchParams(window.location.search);
-  if (params.has('colormode')){
-    document.body.classList.add(`dark-mode-${params.get('colormode')}`);
-  }
   if (params.has('topic')){
+    document.body.className = initTheme();
+
     const topic = params.get('topic')
     const header_link = document.getElementById("inner_body_header_link")
     header_link.classList.add('roboto-medium');

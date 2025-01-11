@@ -18,6 +18,10 @@ color: #B0BEC5;
     "wdth" 100;
 }
 
+.home-logo{
+  height:100%;
+}
+
 .dark-mode-midnight{
   background: #1A1A2E;
   color: #F1F1F1;
@@ -67,13 +71,11 @@ color: #E4E4E4;
   height:7vh;
 }
 
-.home-button, .home-button-spacer {
-  padding-left:3%;
-  padding-right:3%
-}
 
 .home-button-spacer{
   color:#ffffff00;
+  height:100%;
+  aspect-ratio:1;
 }
 
 #inner_body_header_link {
