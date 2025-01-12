@@ -1,13 +1,31 @@
-
+/* 
 html{
   font-size:16px;
+} */
+
+
+body {
+  font-size: 27px;
 }
+@media (min-width: 376px) {
+  body {
+    font-size: 24px;
+  }
+  .inner-body{
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:0;
+    margin-bottom:0;
+  }
+}
+
+
 
 
 /* Desktop */
 body {
-  margin: 0;
-  font-size: 4rem;
+  margin:0;
   background-color: #2A2A2A;
 color: #B0BEC5;
   font-family: "Open Sans", serif;
@@ -55,12 +73,7 @@ color: #E4E4E4;
 
 
 
-/* Mobile */
-/* @media (max-width: 480px) {
-  body {
-      font-size: 4rem;
-  }
-} */
+
 
 
 #inner_body_header {
@@ -97,7 +110,6 @@ color: #E4E4E4;
 
 .search-box{
   width: 100%;
-  font-size: 4rem;
 }
 
 .hidden{
@@ -142,6 +154,20 @@ color: #E4E4E4;
 .inner-body-header{
   text-align: center;
 }
+
+
+
+
+
+/* hide the scrollbar*/
+#scrollable_verses_parent::-webkit-scrollbar {
+  display: none; 
+}
+
+#scrollable_verses_parent {
+  scrollbar-width: none;  
+}
+
 
 
 
