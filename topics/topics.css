@@ -40,6 +40,11 @@ color: #B0BEC5;
   height:100%;
 }
 
+.light-mode-basic{
+  background: #ffffff;
+  color: #000000;
+}
+
 .dark-mode-midnight{
   background: #1A1A2E;
   color: #F1F1F1;
@@ -165,6 +170,14 @@ color: #E4E4E4;
 }
 
 #scrollable_verses_parent {
+  scrollbar-width: none;  
+}
+
+.verse-content::-webkit-scrollbar {
+  display: none; 
+}
+
+.verse-content {
   scrollbar-width: none;  
 }
 

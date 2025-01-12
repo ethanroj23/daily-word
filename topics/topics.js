@@ -10,6 +10,7 @@ let themes = [
 "dark-mode-deep-space",
 "dark-mode-slate",
 "dark-mode-elegant",
+"light-mode-basic",
 ]
 
 // Localstorage stuff
