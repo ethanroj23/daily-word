@@ -185,6 +185,9 @@ function addVerseForTopic(verseToGet, counter){
   const scrollableVerseDiv = createDiv('scrollable-verse', 'div', '', `verse_${counter}`);
   const verseLink = createDiv('verse-link', 'a');
   const verseTitle = createDiv('verse-title', 'div', `${verseToGet.replace("_", " ")}`);
+  verseTitle.onclick = function(event){
+    event.stopPropagation();
+  }
   verseTitle.classList.add('roboto-medium');
   const verseContent = createDiv('verse-content', 'div');
 
