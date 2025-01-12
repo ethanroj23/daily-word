@@ -129,7 +129,7 @@ color: #E4E4E4;
     overflow-y: scroll; /* Allow vertical scrolling */
     scroll-snap-type: y mandatory; /* Enable scroll snapping in the vertical direction */
     -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 
   .scrollable-verse, .next-topic, .see-also, .load-next-topic {

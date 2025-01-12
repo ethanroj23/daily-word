@@ -464,8 +464,10 @@ function addHomeButton(){
 }
 
 let globalTopic;
+let tapScrollDist
 //onload
 function pageLoaded() {
+  tapScrollDist = window.innerHeight/2;
   const params = new URLSearchParams(window.location.search);
   if (params.has('topic')){
     document.body.className = initTheme();
