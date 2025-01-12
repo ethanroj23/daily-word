@@ -393,6 +393,9 @@ function afterLoadingVerses(){
 }
 
 function setupTopicListPage(){
+      document.getElementById("scrollable_verses_parent").onclick = null; // because otherwise the page moves when you tap which is wanted for the reader pages, but not the home page
+
+
       addDivForSearch();
       addDivForThemePicker();
       const recents = getLocalStorageList('recently_read');
