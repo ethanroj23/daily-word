@@ -2,6 +2,7 @@
 
 let allVerseDivs;
 let globalLastRead = {};
+let scrollableVersesParent;
 
 let themes = [
 "dark-mode-midnight",
@@ -174,43 +175,72 @@ function getVerseLink(volumeIdx, bookUnderscore, chapterNumber, verseNumber){
 }
 
 function addVerseForTopic(verseToGet, counter){
-  
+  console.log(verseToGet);
   const bookUnderscoreWithAbbrev = getAbbrevFromAbbrevVerse(verseToGet);
   const bookUnderscore = unabbreviateBook(bookUnderscoreWithAbbrev, counter).replace(" ", "_");
   verseToGet = verseToGet.replace(bookUnderscoreWithAbbrev, bookUnderscore);
 
-  const scrollableVersesParent = document.getElementById('scrollable_verses_parent');
 
   // create divs
+  
+
+  // update div attributes
+  const chapter_verse = verseToGet.split(' ')[1].split(':');
+  const chapterNumber = chapter_verse[0];
+  const verseNumber = chapter_verse[1];
+
+  const volumeIdx = bookToVolumeIdx[bookUnderscore]
+  const volumeText = bookUnderscore in bookToVolumeIdx ? volumeIdxToText[volumeIdx] : "Book of Mormon"
+
+  
+
+  // This is to handle situations like 1 Ne 1-8
+  if (verseNumber && verseNumber.includes('-') && !verseNumber.includes(',')){
+    // Example string
+    const parts = verseNumber.split('-');
+    const startVerse = parseInt(parts[0], 10);
+    const endVerse = parseInt(parts[1], 10);
+    for (let x = startVerse; x <= endVerse; x++){
+      createScrollableVerseDivs(counter, verseToGet, bookUnderscore, chapterNumber, x, volumeIdx, volumeText, true)
+    }
+  }
+  else{
+    createScrollableVerseDivs(counter, verseToGet, bookUnderscore, chapterNumber, verseNumber, volumeIdx, volumeText, false)
+  }
+
+}
+
+function createScrollableVerseDivs(counter, verseToGet, bookUnderscore, chapterNumber, verseNumber, volumeIdx, volumeText, isPartOfSection){
+  
+  let verseFilepath = `/verses/${volumeText}/${bookUnderscore}/${chapterNumber}/${verseNumber}.txt`;
+  if (bookUnderscore == "D&C"){
+    verseFilepath = `/verses/Doctrine and Covenants/Doctrine_And_Covenants/${chapterNumber}/${verseNumber}.txt`
+  }
+
+  const sectionName = `${verseToGet.replace("_", " ")}`;
+  const verseName =  `${bookUnderscore.replace("_", " ")} ${chapterNumber}:${verseNumber}`;
+
   const scrollableVerseDiv = createDiv('scrollable-verse', 'div', '', `verse_${counter}`);
   const verseLink = createDiv('verse-link', 'a');
-  const verseTitle = createDiv('verse-title', 'div', `${verseToGet.replace("_", " ")}`);
+  const verseTitle = createDiv('verse-title', 'div', sectionName);
   verseTitle.onclick = function(event){
     event.stopPropagation();
   }
   verseTitle.classList.add('roboto-medium');
   const verseContent = createDiv('verse-content', 'div');
 
-  // update div attributes
-  const chapter_verse = verseToGet.split(' ')[1].split(':');
-  const chapterNumber = chapter_verse[0];
-  const verseNumber = chapter_verse[1];
-  const volumeIdx = bookToVolumeIdx[bookUnderscore]
-  const volumeText = bookUnderscore in bookToVolumeIdx ? volumeIdxToText[volumeIdx] : "Book of Mormon"
-
-  let verseFilepath = `/verses/${volumeText}/${bookUnderscore}/${chapterNumber}/${verseNumber}.txt`;
-  if (bookUnderscore == "D&C"){
-    verseFilepath = `/verses/Doctrine and Covenants/Doctrine_And_Covenants/${chapterNumber}/${verseNumber}.txt`
-  }
-
   updateDivToVerseText(verseContent, verseFilepath)
 
   verseLink.href = getVerseLink(volumeIdx, bookUnderscore, chapterNumber, verseNumber)
 
-
   // create hierarchy of divs
   verseLink.appendChild(verseTitle)
+  
   scrollableVerseDiv.appendChild(verseLink);
+  if (isPartOfSection){
+    const verseSectionDiv = createDiv('verse-section-title', 'div', verseName);
+    scrollableVerseDiv.appendChild(verseSectionDiv);
+  }
   scrollableVerseDiv.appendChild(verseContent);
   scrollableVersesParent.appendChild(scrollableVerseDiv);
 }
@@ -473,6 +503,7 @@ let globalTopic;
 let tapScrollDist
 //onload
 function pageLoaded() {
+  scrollableVersesParent = document.getElementById("scrollable_verses_parent");
   tapScrollDist = window.innerHeight/2;
   const params = new URLSearchParams(window.location.search);
   if (params.has('topic')){

@@ -156,6 +156,12 @@ color: #E4E4E4;
 }
 
 
+.verse-section-title{
+  font-size:12px;
+  font-style:italic;
+  margin-left:5%;
+}
+
 .inner-body-header{
   text-align: center;
 }
