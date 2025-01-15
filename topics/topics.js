@@ -504,7 +504,7 @@ let tapScrollDist
 //onload
 function pageLoaded() {
   scrollableVersesParent = document.getElementById("scrollable_verses_parent");
-  tapScrollDist = window.innerHeight/2;
+  tapScrollDist = window.innerHeight;
   const params = new URLSearchParams(window.location.search);
   if (params.has('topic')){
     document.body.className = initTheme();
