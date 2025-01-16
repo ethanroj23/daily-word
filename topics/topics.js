@@ -406,6 +406,9 @@ function addDivForTopic(topic){
 
 
 function afterLoadingVerses(){
+  // This is because of a weird bug with ios not properly honoring scroll-snap-type
+  tapScrollDist = document.getElementsByClassName("scrollable-verse")[0].getBoundingClientRect().height
+
   const params = new URLSearchParams(window.location.search);
   globalLastRead = getLocalStorageDict('lastReadVerse');
   if (params.has('last_read')){
