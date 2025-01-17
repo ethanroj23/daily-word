@@ -408,23 +408,15 @@ function addDivForTopic(topic){
 function afterLoadingVerses(){
   // This is because of a weird bug with ios not properly honoring scroll-snap-type
   tapScrollDist = document.getElementsByClassName("scrollable-verse")[0].getBoundingClientRect().height
-
-  const params = new URLSearchParams(window.location.search);
   globalLastRead = getLocalStorageDict('lastReadVerse');
-  if (params.has('last_read')){
-    const last_read = params.get('last_read');
-    document.getElementById(last_read).scrollIntoView();
-  }
-  else{
+
     if (topicIdx in globalLastRead){
       const last_read = globalLastRead[topicIdx];
-      const last_read_div = document.getElementById(last_read);
+      const last_read_div = document.getElementById(`verse_${last_read}`);
       if (last_read_div){
         last_read_div.scrollIntoView();
       }
     }
-  }
-
   allVerseDivs = document.querySelectorAll('.scrollable-verse');
 }
 
@@ -434,16 +426,50 @@ function setupTopicListPage(){
 
       addDivForSearch();
       addDivForThemePicker();
+      globalLastRead = getLocalStorageDict('lastReadVerse');
       const recents = getLocalStorageList('recently_read');
       const saved = getLocalStorageList('saved');
       if (recents) addHomePageSection('Recents');
+      
       for (const topic of recents){
         const topicWithDisplayname = [topic, getTopicDisplayName(topic)];
         addDivForTopic(topicWithDisplayname);
       }
       if (saved) addHomePageSection('Saved');
+      
       for (const topic of saved){
         const topicWithDisplayname = [topic, getTopicDisplayName(topic)];
+        addDivForTopic(topicWithDisplayname);
+      }
+
+      let startedList = [];
+      let finishedList = [];
+      Object.keys(globalLastRead).forEach(topicIdx => {
+        const has_finished = globalLastRead[topicIdx] == "-1";
+        if (has_finished) finishedList.push([topics_list[topicIdx][0], topics_list[topicIdx][1]])
+        else startedList.push([topics_list[topicIdx][0], topics_list[topicIdx][1]])
+      });
+
+
+
+      if (startedList.length != 0) {
+        addHomePageSection('Started');
+        for (const t of startedList){
+          addDivForTopic(t);
+        }
+      }
+
+      if (finishedList.length != 0) {
+        addHomePageSection('Finished');
+        for (const t of finishedList){
+          addDivForTopic(t);
+        }
+      }
+
+
+      addHomePageSection('Recommended');
+      for (const t of topics_sorted_by_ref_count){
+        const topicWithDisplayname = [t[0], getTopicDisplayName(t[0])];
         addDivForTopic(topicWithDisplayname);
       }
 
@@ -543,6 +569,7 @@ function pageLoaded() {
         return item.id;
       }
     };
+    return "-1" // this usually means they are on the end of the chapter
   }
 
 const scrollDiv = document.getElementById('scrollable_verses_parent');
@@ -554,7 +581,7 @@ scrollDiv.addEventListener('scroll', function() {
         console.log('Scrolling stopped!');
         const lastReadVerse = checkVisibility();
 
-        globalLastRead[topicIdx] = lastReadVerse;
+        globalLastRead[topicIdx] = lastReadVerse.replace("verse_", "");
         setLocalStorageDict('lastReadVerse', globalLastRead);
         const div = document.querySelector('.load-next-topic');
         const rect = div.getBoundingClientRect();

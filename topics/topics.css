@@ -96,7 +96,12 @@ color: #E4E4E4;
 }
 
 .home-page-item{
-  margin-left:5%;
+  margin-left:8%;
+}
+
+.home-page-section{
+  margin-left:3%;
+  margin-top: 5%;
 }
 
 .home-button-spacer{
@@ -115,6 +120,7 @@ color: #E4E4E4;
 
 .search-box{
   width: 100%;
+  font-size:24px;
 }
 
 .hidden{
